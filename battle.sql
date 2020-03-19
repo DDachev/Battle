@@ -15,7 +15,7 @@ troll_resistance int not null
 );
 
 create table battle.batlle_information(
-id int primary key,
+id int primary key auto_increment,
 people_number int not null,
 trolls_number int not null,
 people_points int default 0,
