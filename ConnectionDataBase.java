@@ -27,7 +27,7 @@ public class ConnectionDataBase {
 		}
 		return personInfo;
 	}
-	
+
 	public static List<String> getTrollCharachteristics(int trollId) {
 		List<String> trollInfo = new ArrayList<>();
 		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/battle", "root", "1234567890");
@@ -60,4 +60,38 @@ public class ConnectionDataBase {
 		}
 	}
 
+	public static void printInfo(int id) {
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/battle", "root", "1234567890");
+				PreparedStatement ps = con.prepareStatement("select * from battle.batlle_information where id = ?;")) {
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				int numberOfPeople = rs.getInt(2);
+				int numberOfTrolls = rs.getInt(3);
+				int winBattlesFromPeople = rs.getInt(4);
+				int winBattlesFromTrolls = rs.getInt(5);
+				System.out.printf("%nThe result is:%nPeople win - %d battles%nTrolls win - %d battles%n",
+						winBattlesFromPeople, winBattlesFromTrolls);
+				if (winBattlesFromPeople < winBattlesFromTrolls) {
+					System.out.printf("%nTROLLS WIN THE GAME, WITH %d ALIVE!", numberOfTrolls);
+				} else if (winBattlesFromPeople > winBattlesFromTrolls) {
+					System.out.printf("%nPEOPLE WIN THE GAME, WITH %d ALIVE!", numberOfPeople);
+				} else {
+					System.out.println("Equality!");
+				}
+			}
+			deleteResultFromBattle();
+		} catch (SQLException ex) {
+			System.out.println("Cannot get info, because " + ex.getMessage());
+		}
+	}
+
+	private static void deleteResultFromBattle() {
+		try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/battle", "root", "1234567890");
+				PreparedStatement ps = con.prepareStatement("truncate battle.batlle_information;")) {
+			ps.execute();
+		} catch (SQLException ex) {
+			System.out.println("Cannot delete information for result, because " + ex.getMessage());
+		}
+	}
 }
